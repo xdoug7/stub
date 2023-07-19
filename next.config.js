@@ -7,6 +7,7 @@ if (!process.env.GIT_REVISION) {
 
 /** @type {import('next').NextConfig} */
 module.exports = {
+  basePath:"/control",
   reactStrictMode: true,
   env: {
     GIT_REVISION: process.env.GIT_REVISION || revision
