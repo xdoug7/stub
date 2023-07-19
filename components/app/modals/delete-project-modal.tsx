@@ -21,7 +21,7 @@ function EditDomainModal({
   const [inputText, setInputText] = useState('');
   const { project } = useProject();
 
-  const { data: count, isValidating } = useSWR<number>(`/api/projects/${slug}/links/count`, fetcher, {
+  const { data: count, isValidating } = useSWR<number>(`/control/api/projects/${slug}/links/count`, fetcher, {
     keepPreviousData: true
   });
 
@@ -48,7 +48,7 @@ function EditDomainModal({
           onSubmit={async (e) => {
             e.preventDefault();
             setDeleting(true);
-            fetch(`/api/projects/${slug}`, {
+            fetch(`/control/api/projects/${slug}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ function EditDomainModal({
             }).then(async (res) => {
               setDeleting(false);
               if (res.status === 204) {
-                mutate('/api/projects');
+                mutate('/control/api/projects');
                 setShowDeleteProjectModal(false);
                 Router.push('/');
               }

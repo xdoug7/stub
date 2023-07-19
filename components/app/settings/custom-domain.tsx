@@ -13,7 +13,7 @@ export default function CustomDomain() {
   const { project: { domain } = {}, user } = useProject();
   const { data: session } = useSession();
 
-  const { data: domainStatus, isValidating } = useSWR<boolean>(slug && domain && `/api/domains/${domain}/verify`, fetcher);
+  const { data: domainStatus, isValidating } = useSWR<boolean>(slug && domain && `/control/api/domains/${domain}/verify`, fetcher);
 
   const { setShowEditDomainModal, EditDomainModal } = useEditDomainModal();
 
@@ -39,7 +39,7 @@ export default function CustomDomain() {
             {domain ? (
               <button
                 onClick={() => {
-                  mutate(`/api/domains/${domain}/verify`);
+                  mutate(`/control/api/domains/${domain}/verify`);
                 }}
                 disabled={isValidating}
                 className={`${

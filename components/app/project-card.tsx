@@ -7,7 +7,7 @@ import { ProjectProps } from '@/lib/types';
 import { fetcher, nFormatter } from '@/lib/utils';
 
 export default function ProjectCard({ name, slug, domain }: ProjectProps) {
-  const { data: count, isValidating } = useSWR<number>(`/api/projects/${slug}/links/count`, fetcher, {
+  const { data: count, isValidating } = useSWR<number>(`/control/api/projects/${slug}/links/count`, fetcher, {
     keepPreviousData: true
   });
 

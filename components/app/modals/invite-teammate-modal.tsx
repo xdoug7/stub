@@ -32,14 +32,14 @@ function InviteTeammateModal({
           onSubmit={async (e) => {
             e.preventDefault();
             setState('inviting');
-            fetch(`/api/projects/${slug}/invites`, {
+            fetch(`/control/api/projects/${slug}/invites`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email })
             }).then(async (res) => {
               if (res.status === 200) {
                 setState('invited');
-                mutate(`/api/projects/${slug}/invites`);
+                mutate(`/control/api/projects/${slug}/invites`);
               } else {
                 setState('idle');
                 const response = await res.json();

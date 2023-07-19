@@ -11,7 +11,7 @@ export default function UserFilter() {
   const [openPopover, setOpenPopover] = useState(false);
   const router = useRouter();
   const { slug } = router.query as { slug?: string };
-  const { data: members } = useSWR<ProjectUserProps[]>(slug && `/api/projects/${slug}/users`, fetcher, {
+  const { data: members } = useSWR<ProjectUserProps[]>(slug && `/control/api/projects/${slug}/users`, fetcher, {
     dedupingInterval: 30000,
     fallbackData: []
   });

@@ -75,7 +75,7 @@ function AddEditLinkModal({
   const [debouncedKey] = useDebounce(key, 500);
   useEffect(() => {
     if (debouncedKey.length > 0 && debouncedKey !== props?.key) {
-      fetch(`/api/projects/${slug}/links/${encodeURIComponent(debouncedKey)}/exists`).then(async (res) => {
+      fetch(`/control/api/projects/${slug}/links/${encodeURIComponent(debouncedKey)}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
           setKeyExistsError(exists === 1);
@@ -86,7 +86,7 @@ function AddEditLinkModal({
 
   const generateRandomSlug = useCallback(async () => {
     setGeneratingSlug(true);
-    const res = await fetch(`/api/projects/${slug}/links/random`);
+    const res = await fetch(`/control/api/projects/${slug}/links/random`);
     const key = await res.json();
     setData((prev) => ({ ...prev, key }));
     setGeneratingSlug(false);
@@ -96,12 +96,12 @@ function AddEditLinkModal({
     if (props?.key) {
       return {
         method: 'PUT',
-        url: `/api/projects/${slug}/links/${encodeURIComponent(props.key)}`
+        url: `/control/api/projects/${slug}/links/${encodeURIComponent(props.key)}`
       };
     } else {
       return {
         method: 'POST',
-        url: `/api/projects/${slug}/links`
+        url: `/control/api/projects/${slug}/links`
       };
     }
   }, [props]);
@@ -147,7 +147,7 @@ function AddEditLinkModal({
               .then((res) => {
                 setSaving(false);
                 if (res.status === 200) {
-                  mutate(`/api/projects/${slug}/links${getQueryString(router)}`);
+                  mutate(`/control/api/projects/${slug}/links${getQueryString(router)}`);
                   setShowAddEditLinkModal(false);
                 } else {
                   res.json().then(setError);

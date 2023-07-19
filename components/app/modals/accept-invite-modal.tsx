@@ -32,11 +32,11 @@ function AcceptInviteModal({
           <button
             onClick={() => {
               setAccepting(true);
-              fetch(`/api/projects/${slug}/invite/accept`, {
+              fetch(`/control/api/projects/${slug}/invite/accept`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
               }).then(async () => {
-                mutate(`/api/projects/${slug}`);
+                mutate(`/control/api/projects/${slug}`);
                 setShowAcceptInviteModal(false);
               });
             }}

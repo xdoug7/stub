@@ -18,7 +18,7 @@ export default function ProjectSettingsPeople() {
   const [currentTab, setCurrentTab] = useState('Members');
 
   const { data: users } = useSWR<UserProps[]>(
-    slug && (currentTab === 'Members' ? `/api/projects/${slug}/users` : `/api/projects/${slug}/invites`),
+    slug && (currentTab === 'Members' ? `/control/api/projects/${slug}/users` : `/control/api/projects/${slug}/invites`),
     fetcher
   );
 

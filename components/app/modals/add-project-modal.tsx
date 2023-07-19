@@ -34,7 +34,7 @@ function AddProjectModalHelper({
   const [debouncedSlug] = useDebounce(slug, 500);
   useEffect(() => {
     if (debouncedSlug.length > 0 && !slugError) {
-      fetch(`/api/projects/${slug}/exists`).then(async (res) => {
+      fetch(`/control/api/projects/${slug}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
           setSlugError(exists === 1 ? 'Slug is already in use.' : null);
@@ -46,7 +46,7 @@ function AddProjectModalHelper({
   const [debouncedDomain] = useDebounce(domain, 500);
   useEffect(() => {
     if (debouncedDomain.length > 0 && !domainError) {
-      fetch(`/api/domains/${debouncedDomain}/exists`).then(async (res) => {
+      fetch(`/control/api/domains/${debouncedDomain}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
           setDomainError(exists === 1 ? 'Domain is already in use.' : null);
@@ -75,7 +75,7 @@ function AddProjectModalHelper({
           onSubmit={async (e: FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             setSaving(true);
-            fetch(`/api/projects`, {
+            fetch(`/control/api/projects`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -84,7 +84,7 @@ function AddProjectModalHelper({
             }).then(async (res) => {
               setSaving(false);
               if (res.status === 200) {
-                mutate(`/api/projects`);
+                mutate(`/control/api/projects`);
                 router.push(`/p/${slug}`);
               } else if (res.status === 422) {
                 const { slugError: slugErrorResponse, domainError: domainErrorResponse } = await res.json();

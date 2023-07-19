@@ -15,7 +15,7 @@ export default function OGSection({ data, setData }: { data: LinkProps; setData:
 
   const generateTitleFromUrl = async () => {
     setGeneratingTitle(true);
-    fetch(`/api/link-metadata?url=${url}`).then(async (res) => {
+    fetch(`/control/api/link-metadata?url=${url}`).then(async (res) => {
       if (res.status === 200) {
         const results = await res.json();
         setData((prev) => ({ ...prev, title: results.title ?? '' }));
@@ -26,7 +26,7 @@ export default function OGSection({ data, setData }: { data: LinkProps; setData:
 
   const generateDescriptionFromUrl = async () => {
     setGeneratingDescription(true);
-    fetch(`/api/link-metadata?url=${url}`).then(async (res) => {
+    fetch(`/control/api/link-metadata?url=${url}`).then(async (res) => {
       if (res.status === 200) {
         const results = await res.json();
         setData((prev) => ({ ...prev, description: results.description ?? '' }));

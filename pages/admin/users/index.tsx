@@ -10,7 +10,7 @@ import { getSession } from '@/lib/auth';
 import { fetcher } from '@/lib/utils';
 
 export default function AdminUsers() {
-  const { data: { users } = {} } = useSWR<{ users: User[] }>('/api/admin/users', fetcher);
+  const { data: { users } = {} } = useSWR<{ users: User[] }>('/control/api/admin/users', fetcher);
 
   return (
     <AppLayout pageTitle="Users">

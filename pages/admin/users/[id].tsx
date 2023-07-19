@@ -40,7 +40,7 @@ function EditProfile({ user }: { user: User }) {
     setSaving(true);
     setError(null);
 
-    const response = await fetch(`/api/admin/users/${user.id}`, {
+    const response = await fetch(`/control/api/admin/users/${user.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -60,7 +60,7 @@ function EditProfile({ user }: { user: User }) {
     }
 
     if (response.status !== 200) setError(body);
-    else mutate(`/api/admin/users/${user.id}`);
+    else mutate(`/control/api/admin/users/${user.id}`);
     setSaving(false);
   }
 
@@ -185,7 +185,7 @@ function EditProfile({ user }: { user: User }) {
 export default function AdminUserProfile() {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const { data: { user, accounts, lastLogin } = {} } = useSWR<AdminUserProps>(id && `/api/admin/users/${id}`, fetcher, {
+  const { data: { user, accounts, lastLogin } = {} } = useSWR<AdminUserProps>(id && `/control/api/admin/users/${id}`, fetcher, {
     dedupingInterval: 30000
   });
 

@@ -11,7 +11,7 @@ import { ProjectProps } from '@/lib/types';
 import { fetcher, getFaviconFromDomain } from '@/lib/utils';
 
 export default function ProjectSelect() {
-  const { data: projects } = useSWR<ProjectProps[]>('/api/projects', fetcher);
+  const { data: projects } = useSWR<ProjectProps[]>('/control/api/projects', fetcher);
   const { AddProjectModal, setShowAddProjectModal } = useAddProjectModal({});
 
   const router = useRouter();

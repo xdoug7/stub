@@ -46,7 +46,7 @@ function ArchiveLinkModal({
             onClick={async (e) => {
               e.preventDefault();
               setArchiving(true);
-              fetch(`/api/projects/${slug}/links/${encodeURIComponent(props.key)}/archive`, {
+              fetch(`/control/api/projects/${slug}/links/${encodeURIComponent(props.key)}/archive`, {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ function ArchiveLinkModal({
               }).then(async (res) => {
                 setArchiving(false);
                 if (res.status === 200) {
-                  mutate(`/api/projects/${slug}/links${getQueryString(router)}`);
+                  mutate(`/control/api/projects/${slug}/links${getQueryString(router)}`);
                   setShowArchiveLinkModal(false);
                 }
               });
