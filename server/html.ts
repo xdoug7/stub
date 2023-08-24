@@ -1,4 +1,4 @@
-import { escape } from 'html-escaper';
+import he from 'he';
 import { ServerResponse } from 'http';
 
 import { prisma } from './prisma';
@@ -18,20 +18,20 @@ export async function getEmbedHTML(res: ServerResponse, domain: string, key: str
   return `
     <html>
       <head>
-        <title>${escape(link.title)}</title>
-        <meta property="og:title" content="${escape(link.title)}" />
-        <meta property="og:site_name" content="${escape(link.url)}" />
-        <meta property="og:description" content="${escape(link.description)}" />
-        <meta property="og:image" content="${escape(link.image)}" />
+        <title>${he.encode(link.title)}</title>
+        <meta property="og:title" content="${he.encode(link.title)}" />
+        <meta property="og:site_name" content="${he.encode(link.url)}" />
+        <meta property="og:description" content="${he.encode(link.description)}" />
+        <meta property="og:image" content="${he.encode(link.image)}" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="${escape(link.url)}" />
-        <meta name="twitter:title" content="${escape(link.title)}" />
-        <meta name="twitter:description" content="${escape(link.description)}" />
-        <meta name="twitter:image" content="${escape(link.image)}" />
+        <meta name="twitter:site" content="${he.encode(link.url)}" />
+        <meta name="twitter:title" content="${he.encode(link.title)}" />
+        <meta name="twitter:description" content="${he.encode(link.description)}" />
+        <meta name="twitter:image" content="${he.encode(link.image)}" />
       </head>
       <body>
-        <h1>${escape(link.title)}</h1>
-        <p>${escape(link.description)}</p>
+        <h1>${he.encode(link.title)}</h1>
+        <p>${he.encode(link.description)}</p>
       </body>
     </html>
   `;
@@ -214,7 +214,7 @@ export function getPasswordPageHTML(attemptedPassword?: string) {
                 <label for="password">PASSWORD</label>
                 <div class="input-outer${attemptedPassword ? ' error' : ''}">
                   <input type="password" name="password" id="password" ${
-                    attemptedPassword ? `value="${escape(attemptedPassword)}"` : ''
+                    attemptedPassword ? `value="${he.encode(attemptedPassword)}"` : ''
                   } required autofocus autocomplete="link-password">
                   <div class="error-icon">
                     <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
