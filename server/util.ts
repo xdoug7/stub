@@ -23,6 +23,7 @@ export function serverRedirect(res: ServerResponse, location: string, status = 3
 
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
+  console.info(`Validating bot for User Agent: ${ua}`)
   if (ua) {
     /* Note:
      * - bot is for most bots & crawlers

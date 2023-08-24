@@ -153,7 +153,9 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       res.statusCode = 200;
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
-      if (target.startsWith('https://youtube.com') || target.startsWith('https://youtu.be')) {
+      const isYouTubeLink = target.startsWith('https://youtube.com') || target.startsWith('https://youtu.be')
+      console.log('Is YouTube? ', isYouTubeLink);
+      if (isYouTubeLink) {
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
         console.log('YouTube Deep Link:', deepLink);
