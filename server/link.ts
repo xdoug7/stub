@@ -67,7 +67,6 @@ function handleYouTubeLink(url: string, userAgent: string) {
 
   // Detect the device type (iOS/Android) based on the user agent
   const deviceType = /iPhone|iPad|iPod/.test(userAgent) ? 'ios' : /Android/.test(userAgent) ? 'android' : 'other';
-  console.log('Detected Device Type:', deviceType);
 
   // Try to match the URL with each pattern and return the corresponding deep link
   for (const [category, regexes] of Object.entries(patterns)) {
@@ -157,6 +156,7 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       if (isYouTubeLink) {
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
+        console.log('Deep Link: ', deepLink)
         if (/iPad|iPhone|iPod/.test(userAgent)) {
           const fallbackUrl = target;
           sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
