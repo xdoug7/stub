@@ -57,11 +57,11 @@ function handleYouTubeLink(url: string, userAgent: string) {
       playlist: 'youtube://playlist?list=$1',
     },
     android: {
-      channel: 'intent://www.youtube.com/channel/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
-      video: 'intent://www.youtube.com/watch?v=$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
-      shortVideo: 'intent://www.youtube.com/shorts/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
-      liveVideo: 'intent://www.youtube.com/live/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
-      playlist: 'intent://www.youtube.com/playlist?list=$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
+      channel: 'intent://www.youtube.com/channel/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      video: 'intent://www.youtube.com/watch?v=$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      shortVideo: 'intent://www.youtube.com/shorts/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      liveVideo: 'intent://www.youtube.com/live/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      playlist: 'intent://www.youtube.com/playlist?list=$1#Intent;scheme=http;package=com.google.android.youtube;end',
     },
   };
 
@@ -80,7 +80,7 @@ function handleYouTubeLink(url: string, userAgent: string) {
         }
         
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
-        return deepLink.replace('$1', match[2]).replace('$2', encodeURIComponent(url));
+        return deepLink.replace('$1', match[2]);
       }
     }
   }
@@ -156,13 +156,8 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       if (isYouTubeLink) {
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
-        console.log('Deep Link: ', deepLink)
-        if (/iPad|iPhone|iPod/.test(userAgent)) {
-          const fallbackUrl = target;
-          sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
-        } else {
-          serverRedirect(res, deepLink);
-        }
+        const fallbackUrl = target;
+        sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
       } else {
         serverRedirect(res, target);
       }
