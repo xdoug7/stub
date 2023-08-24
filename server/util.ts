@@ -24,28 +24,25 @@ export function serverRedirect(res: ServerResponse, location: string, status = 3
 export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, fallbackUrl: string) {
   const html = `
     <html>
-      <head>
-        <script>
+      <body>
+
+      <script>
           var deepLink = '${deepLink}';
           var fallbackUrl = '${fallbackUrl}';
           var timeout;
+          window.onload = function() {
+            // Deep link to your app goes here
+            document.getElementById("l").src = deepLink;
 
-          function openDeepLink() {
-            document.location = deepLink;
-            timeout = setTimeout(function() {
-              document.location = fallbackUrl;
-            }, 1000);
-          }
-
-          function clearFallback() {
-            clearTimeout(timeout);
-          }
-
-          window.addEventListener('pagehide', clearFallback);
-          setTimeout(openDeepLink, 0);
+            setTimeout(function() {
+                // Link to the App Store should go here -- only fires if deep link fails                
+                window.location = fallbackUrl;
+            }, 500);
+        };
         </script>
-      </head>
-      <body></body>
+
+        <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
+      </body>
     </html>
   `;
 

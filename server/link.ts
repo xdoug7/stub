@@ -161,8 +161,14 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
         console.log('YouTube Deep Link:', deepLink);
-        const fallbackUrl = target;
-        sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
+        if (/iPad|iPhone|iPod/.test(userAgent)) {
+          const deepLink = handleYouTubeLink(target, userAgent);
+          console.log('YouTube Deep Link:', deepLink);
+          const fallbackUrl = target;
+          sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
+        } else {
+          serverRedirect(res, target);
+        }
       } else {
         console.log('Redirecting to target...');
         serverRedirect(res, target);
