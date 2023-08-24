@@ -154,7 +154,7 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
       // Check if the target URL is a YouTube link
-      const youtubePattern = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//;
+      const youtubePattern = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)(\/|$)/;
       const isYouTubeLink = youtubePattern.test(target)
       console.log('Is YouTube? ', isYouTubeLink);
       if (isYouTubeLink) {
