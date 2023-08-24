@@ -57,11 +57,11 @@ function handleYouTubeLink(url: string, userAgent: string) {
       playlist: 'youtube://playlist?list=$1',
     },
     android: {
-      channel: 'youtube://channel/$1',
-      video: 'youtube://watch?v=$1',
-      shortVideo: 'youtube://shorts/$1',
-      liveVideo: 'youtube://live/$1',
-      playlist: 'youtube://playlist?list=$1',
+      channel: 'intent://www.youtube.com/channel/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      video: 'intent://www.youtube.com/watch?v=$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      shortVideo: 'intent://www.youtube.com/shorts/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      liveVideo: 'intent://www.youtube.com/live/$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      playlist: 'intent://www.youtube.com/playlist?list=$1#Intent;scheme=http;package=com.google.android.youtube;end',
     },
   };
 
