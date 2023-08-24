@@ -33,16 +33,19 @@ export async function recordClick(hostname: string, req: IncomingMessage, ip: st
 
 export default async function handleLink(req: IncomingMessage, res: ServerResponse) {
   const { hostname, key: linkKey, query } = parseUrl(req);
+  console.log('Parsed URL:', { hostname, key: linkKey, query });
 
   const key = linkKey || ':index';
   if (!hostname) return false;
 
   // Get the IP
   let ip = req.socket.remoteAddress ?? '127.0.0.1';
+  console.log('Initial IP:', ip);
   if (process.env.TRUST_PROXY === 'true') {
     const proxyHeader = process.env.TRUST_PROXY_HEADER || 'cf-connecting-ip';
     if (proxyHeader && req.headers[proxyHeader])
       ip = Array.isArray(req.headers[proxyHeader]) ? req.headers[proxyHeader][0] : (req.headers[proxyHeader] as string);
+    console.log('Proxy IP:', ip);
   }
 
   const response = await redis.get(`${hostname}:${key}`).then((r) => {
@@ -54,13 +57,21 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       };
     return null;
   });
+  console.log('Response from Redis:', response);
+
   const target = response?.url;
+  console.log('Target URL:', target);
 
   if (target) {
     const isBot = detectBot(req);
+    console.log('Is Bot:', isBot);
     if (response.password) {
-      if (await validPasswordCookie(req, hostname, key)) serverRedirect(res, target);
+      if (await validPasswordCookie(req, hostname, key)) {
+        console.log('Valid password cookie. Redirecting...');
+        serverRedirect(res, target);
+      }
       else if (query.password !== '' && typeof query.password === 'string' && (await passwordValid(hostname, key, query.password))) {
+        console.log('Password query valid. Redirecting...');
         res.setHeader(
           'Set-Cookie',
           cookie.serialize('stub_link_password', query.password, {
@@ -70,6 +81,7 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         );
         serverRedirect(res, target);
       } else {
+        console.log('Password required. Sending password page...');
         res.statusCode = 200;
         if (hasPasswordCookie(req))
           res.setHeader(
@@ -82,14 +94,16 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         res.end(getPasswordPageHTML(typeof query.password === 'string' ? query.password : undefined));
       }
     } else if (response.proxy && isBot) {
+      console.log('Proxying for bot. Sending embed HTML...');
       res.statusCode = 200;
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
+      console.log('Redirecting to target...');
       serverRedirect(res, target);
     }
     await recordClick(hostname, req, ip, key);
   } else {
-    // TODO allow for 404 links
+    console.log('Not Found. Sending 404...');
     res.statusCode = 404;
     res.end('Not Found');
   }
