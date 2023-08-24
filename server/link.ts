@@ -32,19 +32,23 @@ export async function recordClick(hostname: string, req: IncomingMessage, ip: st
 }
 
 function handleYouTubeLink(url: string, userAgent: string) {
+  // Log the input URL and User Agent
+  console.log('Handling YouTube URL:', url);
+  console.log('User Agent:', userAgent);
+
   // Define a set of regular expressions to match various YouTube URL patterns
   const patterns = {
     channel: [
-      /^https:\/\/youtube\.com\/@(\w+)/,
-      /^https:\/\/youtube\.com\/c\/(\w+)/,
+      /^https:\/\/(www\.)?youtube\.com\/@(\w+)/,
+      /^https:\/\/(www\.)?youtube\.com\/c\/(\w+)/,
     ],
     video: [
-      /^https:\/\/youtube\.com\/watch\?v=([\w-]+)/,
-      /^https:\/\/youtu\.be\/([\w-]+)/,
+      /^https:\/\/(www\.)?youtube\.com\/watch\?v=([\w-]+)/,
+      /^https:\/\/(www\.)?youtu\.be\/([\w-]+)/,
     ],
-    shortVideo: [/^https:\/\/youtube\.com\/shorts\/([\w-]+)/],
-    liveVideo: [/^https:\/\/youtube\.com\/live\/([\w-]+)/],
-    playlist: [/^https:\/\/youtube\.com\/playlist\?list=([\w-]+)/],
+    shortVideo: [/^https:\/\/(www\.)?youtube\.com\/shorts\/([\w-]+)/],
+    liveVideo: [/^https:\/\/(www\.)?youtube\.com\/live\/([\w-]+)/],
+    playlist: [/^https:\/\/(www\.)?youtube\.com\/playlist\?list=([\w-]+)/],
   };
 
   // Define corresponding app deep link formats for iOS and Android
@@ -67,6 +71,7 @@ function handleYouTubeLink(url: string, userAgent: string) {
 
   // Detect the device type (iOS/Android) based on the user agent
   const deviceType = /iPhone|iPad|iPod/.test(userAgent) ? 'ios' : /Android/.test(userAgent) ? 'android' : 'other';
+  console.log('Detected Device Type:', deviceType);
 
   // Try to match the URL with each pattern and return the corresponding deep link
   for (const [category, regexes] of Object.entries(patterns)) {
@@ -74,12 +79,17 @@ function handleYouTubeLink(url: string, userAgent: string) {
       const match = url.match(pattern);
       if (match) {
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
+        console.log('Matched Category:', category); // Log matched category
+        console.log('Matched Pattern:', pattern); // Log matched pattern
+        console.log('Match Result:', match); // Log match result
+        console.log('Deep Link:', deepLink.replace('$1', match[1])); // Log the deep link
         return deepLink.replace('$1', match[1]);
       }
     }
   }
 
-  // Return the original URL if no pattern matches
+  // Log when no pattern matches, and the original URL is returned
+  console.log('No matching pattern found. Returning original URL:', url);
   return url;
 }
 
