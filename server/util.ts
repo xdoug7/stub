@@ -54,7 +54,6 @@ export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, 
 
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
-  console.info(`Validating bot for User Agent: ${ua}`)
   if (ua) {
     /* Note:
      * - bot is for most bots & crawlers
