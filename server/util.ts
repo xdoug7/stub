@@ -21,10 +21,40 @@ export function serverRedirect(res: ServerResponse, location: string, status = 3
   res.end();
 }
 
+export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, fallbackUrl: string) {
+  const html = `
+    <html>
+      <body>
+
+      <script>
+          var deepLink = '${deepLink}';
+          var fallbackUrl = '${fallbackUrl}';
+          var timeout;
+          window.onload = function() {
+            // Deep link to your app goes here
+            document.getElementById("l").src = deepLink;
+
+            setTimeout(function() {
+                // Link to the App Store should go here -- only fires if deep link fails                
+                window.location = fallbackUrl;
+            }, 500);
+        };
+        </script>
+
+        <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
+      </body>
+    </html>
+  `;
+
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html');
+  res.end(html);
+}
+
+
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
   if (ua) {
-    /* Extended list of known bot signatures */
     return /bot|crawler|spider|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector|Twitterbot|Yahoo|AhrefsBot/i.test(ua);
   }
   return false;
