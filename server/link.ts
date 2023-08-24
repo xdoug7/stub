@@ -6,7 +6,7 @@ import { hasPasswordCookie, passwordValid, validPasswordCookie } from './decrypt
 import { getGeo } from './geoip';
 import { getEmbedHTML, getPasswordPageHTML } from './html';
 import { userAgentFromString } from './ua';
-import { detectBot, parseUrl, serverRedirect } from './util';
+import { detectBot, parseUrl, serverRedirect, sendDeepLinkWithFallback } from './util';
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
@@ -57,11 +57,11 @@ function handleYouTubeLink(url: string, userAgent: string) {
       playlist: 'youtube://playlist?list=$1',
     },
     android: {
-      channel: 'intent://www.youtube.com/channel/$1#Intent;scheme=http;package=com.google.android.youtube;end',
-      video: 'intent://www.youtube.com/watch?v=$1#Intent;scheme=http;package=com.google.android.youtube;end',
-      shortVideo: 'intent://www.youtube.com/shorts/$1#Intent;scheme=http;package=com.google.android.youtube;end',
-      liveVideo: 'intent://www.youtube.com/live/$1#Intent;scheme=http;package=com.google.android.youtube;end',
-      playlist: 'intent://www.youtube.com/playlist?list=$1#Intent;scheme=http;package=com.google.android.youtube;end',
+      channel: 'intent://www.youtube.com/channel/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
+      video: 'intent://www.youtube.com/watch?v=$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
+      shortVideo: 'intent://www.youtube.com/shorts/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
+      liveVideo: 'intent://www.youtube.com/live/$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
+      playlist: 'intent://www.youtube.com/playlist?list=$1#Intent;scheme=http;package=com.google.android.youtube;S.browser_fallback_url=$2;end',
     },
   };
 
@@ -81,7 +81,7 @@ function handleYouTubeLink(url: string, userAgent: string) {
         }
         
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
-        return deepLink.replace('$1', match[2]);
+        return deepLink.replace('$1', match[2]).replace('$2', encodeURIComponent(url));
       }
     }
   }
@@ -161,7 +161,8 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
         console.log('YouTube Deep Link:', deepLink);
-        serverRedirect(res, deepLink);
+        const fallbackUrl = target;
+        sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
       } else {
         console.log('Redirecting to target...');
         serverRedirect(res, target);

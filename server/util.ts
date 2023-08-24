@@ -21,6 +21,40 @@ export function serverRedirect(res: ServerResponse, location: string, status = 3
   res.end();
 }
 
+export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, fallbackUrl: string) {
+  const html = `
+    <html>
+      <head>
+        <script>
+          var deepLink = '${deepLink}';
+          var fallbackUrl = '${fallbackUrl}';
+          var timeout;
+
+          function openDeepLink() {
+            document.location = deepLink;
+            timeout = setTimeout(function() {
+              document.location = fallbackUrl;
+            }, 1000);
+          }
+
+          function clearFallback() {
+            clearTimeout(timeout);
+          }
+
+          window.addEventListener('pagehide', clearFallback);
+          setTimeout(openDeepLink, 0);
+        </script>
+      </head>
+      <body></body>
+    </html>
+  `;
+
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html');
+  res.end(html);
+}
+
+
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
   console.info(`Validating bot for User Agent: ${ua}`)
