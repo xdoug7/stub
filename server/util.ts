@@ -24,12 +24,8 @@ export function serverRedirect(res: ServerResponse, location: string, status = 3
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
   if (ua) {
-    /* Note:
-     * - bot is for most bots & crawlers
-     * - facebookexternalhit is for Facebook crawler
-     * - MetaInspector is for https://metatags.io/
-     */
-    return /bot|facebookexternalhit|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector/i.test(ua);
+    /* Extended list of known bot signatures */
+    return /bot|crawler|spider|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector|Twitterbot|Yahoo|AhrefsBot/i.test(ua);
   }
   return false;
 };
