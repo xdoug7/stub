@@ -78,11 +78,13 @@ function handleYouTubeLink(url: string, userAgent: string) {
     for (const pattern of regexes) {
       const match = url.match(pattern);
       if (match) {
+        // If the device type is 'other', fall back to the original URL
+        if (deviceType === 'other') {
+          console.log(`No deep link for '${category}' category on device type 'other'. Returning original URL.`);
+          return url;
+        }
+        
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
-        console.log('Matched Category:', category); // Log matched category
-        console.log('Matched Pattern:', pattern); // Log matched pattern
-        console.log('Match Result:', match); // Log match result
-        console.log('Deep Link:', deepLink.replace('$1', match[1])); // Log the deep link
         return deepLink.replace('$1', match[1]);
       }
     }
