@@ -30,7 +30,7 @@ export default function LinkCard({ props }: { props: LinkProps }) {
   const { domain } = project || {};
   const { data: session } = useSession();
 
-  const { data: clicks, isValidating } = useSWR<number>(`/api/projects/${slug}/links/${encodeURIComponent(key)}/clicks`, fetcher, {
+  const { data: clicks, isValidating } = useSWR<number>(`/control/api/projects/${slug}/links/${encodeURIComponent(key)}/clicks`, fetcher, {
     fallbackData: props.clicks
   });
 
@@ -145,11 +145,11 @@ export default function LinkCard({ props }: { props: LinkProps }) {
                         return;
                       }
                       setUnarchiving(true);
-                      fetch(`/api/projects/${slug}/links/${encodeURIComponent(props.key)}/archive`, { method: 'DELETE' }).then(async (res) => {
+                      fetch(`/control/api/projects/${slug}/links/${encodeURIComponent(props.key)}/archive`, { method: 'DELETE' }).then(async (res) => {
                         setUnarchiving(false);
                         setOpenPopover(false);
                         if (res.status === 200) {
-                          mutate(`/api/projects/${slug}/links${getQueryString(router)}`);
+                          mutate(`/control/api/projects/${slug}/links${getQueryString(router)}`);
                           setShowArchiveLinkModal(false);
                         }
                       });

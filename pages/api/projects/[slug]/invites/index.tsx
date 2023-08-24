@@ -80,7 +80,7 @@ export default withProjectAuth(async (req: NextApiRequest, res: NextApiResponse,
         token
       });
 
-      const url = `${process.env.NEXTAUTH_URL}/api/auth/callback/email?${params}`;
+      const url = `${process.env.NEXTAUTH_URL}/control/api/auth/callback/email?${params}`;
 
       sendMail({
         subject: "You've been invited to join a project on Stub",

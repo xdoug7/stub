@@ -52,7 +52,7 @@ function DeleteLinkModal({
           onSubmit={async (e) => {
             e.preventDefault();
             setDeleting(true);
-            fetch(`/api/projects/${slug}/links/${encodeURIComponent(props.key)}`, {
+            fetch(`/control/api/projects/${slug}/links/${encodeURIComponent(props.key)}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ function DeleteLinkModal({
             }).then(async (res) => {
               setDeleting(false);
               if (res.status === 200) {
-                mutate(`/api/projects/${slug}/links`);
+                mutate(`/control/api/projects/${slug}/links`);
                 setShowDeleteLinkModal(false);
               }
             });

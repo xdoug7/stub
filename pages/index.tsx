@@ -12,7 +12,7 @@ import { ProjectProps } from '@/lib/types';
 import { fetcher } from '@/lib/utils';
 
 export default function App() {
-  const { data } = useSWR<ProjectProps[]>('/api/projects', fetcher);
+  const { data } = useSWR<ProjectProps[]>('/control/api/projects', fetcher);
   const { setShowAddProjectModal, AddProjectModal } = useAddProjectModal({});
   const { data: session } = useSession();
 

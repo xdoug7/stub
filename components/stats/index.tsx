@@ -21,7 +21,7 @@ export default function Stats({ atModalTop, domain }: { atModalTop?: boolean; do
   };
 
   const { data, error, isValidating } = useSWR<StatsProps>(
-    router.isReady && `/api/projects/${slug}/links/${encodeURIComponent(key)}/stats${interval ? `?interval=${interval}` : ''}`,
+    router.isReady && `/control/api/projects/${slug}/links/${encodeURIComponent(key)}/stats${interval ? `?interval=${interval}` : ''}`,
     fetcher,
     {
       keepPreviousData: true,

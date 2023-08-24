@@ -27,7 +27,7 @@ function EditDomainModal({
   const [debouncedDomain] = useDebounce(data, 500);
   useEffect(() => {
     if (debouncedDomain.length > 0 && debouncedDomain !== domain) {
-      fetch(`/api/domains/${debouncedDomain}/exists`).then(async (res) => {
+      fetch(`/control/api/domains/${debouncedDomain}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
           setDomainError(exists === 1 ? 'Domain is already in use.' : null);
@@ -55,7 +55,7 @@ function EditDomainModal({
           onSubmit={async (e) => {
             e.preventDefault();
             setSaving(true);
-            fetch(`/api/projects/${slug}/domain`, {
+            fetch(`/control/api/projects/${slug}/domain`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -64,7 +64,7 @@ function EditDomainModal({
             }).then(async (res) => {
               setSaving(false);
               if (res.status === 200) {
-                mutate(`/api/projects/${slug}`);
+                mutate(`/control/api/projects/${slug}`);
                 setShowEditDomainModal(false);
               } else if (res.status === 422) {
                 const { domainError: domainErrorResponse } = await res.json();
