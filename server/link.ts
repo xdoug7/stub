@@ -85,7 +85,7 @@ function handleYouTubeLink(url: string, userAgent: string) {
         }
         
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
-        return deepLink.replace('$1', match[1]);
+        return deepLink.replace('$1', match[2]);
       }
     }
   }
