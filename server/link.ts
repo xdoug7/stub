@@ -17,9 +17,6 @@ const redis = new Redis({
 
 /** Recording clicks with geo, ua, referer and timestamp data **/
 export async function recordClick(hostname: string, req: IncomingMessage, ip: string, key: string) {
-  console.log('Request object:', req);
-  console.log('Request headers:', req.headers);
-
   const now = Date.now();
   return await redis.zadd(
     `${hostname}:clicks:${key}`,
@@ -35,10 +32,6 @@ export async function recordClick(hostname: string, req: IncomingMessage, ip: st
 }
 
 function handleYouTubeLink(url: string, userAgent: string) {
-  // Log the input URL and User Agent
-  console.log('Handling YouTube URL:', url);
-  console.log('User Agent:', userAgent);
-
   // Define a set of regular expressions to match various YouTube URL patterns
   const patterns = {
     channel: [
@@ -107,12 +100,10 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
 
   // Get the IP
   let ip = req.socket.remoteAddress ?? '127.0.0.1';
-  console.log('Initial IP:', ip);
   if (process.env.TRUST_PROXY === 'true') {
     const proxyHeader = process.env.TRUST_PROXY_HEADER || 'cf-connecting-ip';
     if (proxyHeader && req.headers[proxyHeader])
       ip = Array.isArray(req.headers[proxyHeader]) ? req.headers[proxyHeader][0] : (req.headers[proxyHeader] as string);
-    console.log('Proxy IP:', ip);
   }
 
   const response = await redis.get(`${hostname}:${key}`).then((r) => {
@@ -128,8 +119,6 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
 
   // Check if the target URL is a YouTube link, and handle it accordingly
   const target = response?.url;
-  console.log('Target URL:', target);
-
   if (target) {
     const isBot = detectBot(req);
     console.log('Is Bot:', isBot);
@@ -137,11 +126,9 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
     // Check if the target URL is a YouTube link and if so, convert it to a deep link
     if (response.password) {
       if (await validPasswordCookie(req, hostname, key)) {
-        console.log('Valid password cookie. Redirecting...');
         serverRedirect(res, target);
       }
       else if (query.password !== '' && typeof query.password === 'string' && (await passwordValid(hostname, key, query.password))) {
-        console.log('Password query valid. Redirecting...');
         res.setHeader(
           'Set-Cookie',
           cookie.serialize('stub_link_password', query.password, {
@@ -151,7 +138,6 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         );
         serverRedirect(res, target);
       } else {
-        console.log('Password required. Sending password page...');
         res.statusCode = 200;
         if (hasPasswordCookie(req))
           res.setHeader(
@@ -164,7 +150,6 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
         res.end(getPasswordPageHTML(typeof query.password === 'string' ? query.password : undefined));
       }
     } else if (response.proxy && isBot) {
-      console.log('Proxying for bot. Sending embed HTML...');
       res.statusCode = 200;
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
