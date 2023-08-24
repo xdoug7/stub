@@ -17,6 +17,9 @@ const redis = new Redis({
 
 /** Recording clicks with geo, ua, referer and timestamp data **/
 export async function recordClick(hostname: string, req: IncomingMessage, ip: string, key: string) {
+  console.log('Request object:', req);
+  console.log('Request headers:', req.headers);
+
   const now = Date.now();
   return await redis.zadd(
     `${hostname}:clicks:${key}`,
