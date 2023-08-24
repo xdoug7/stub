@@ -93,7 +93,6 @@ function handleYouTubeLink(url: string, userAgent: string) {
 
 export default async function handleLink(req: IncomingMessage, res: ServerResponse) {
   const { hostname, key: linkKey, query } = parseUrl(req);
-  console.log('Parsed URL:', { hostname, key: linkKey, query });
 
   const key = linkKey || ':index';
   if (!hostname) return false;
@@ -115,13 +114,11 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       };
     return null;
   });
-  console.log('Response from Redis:', response);
 
   // Check if the target URL is a YouTube link, and handle it accordingly
   const target = response?.url;
   if (target) {
     const isBot = detectBot(req);
-    console.log('Is Bot:', isBot);
 
     // Check if the target URL is a YouTube link and if so, convert it to a deep link
     if (response.password) {
@@ -160,17 +157,13 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       if (isYouTubeLink) {
         const userAgent = req.headers['user-agent'] || '';
         const deepLink = handleYouTubeLink(target, userAgent);
-        console.log('YouTube Deep Link:', deepLink);
         if (/iPad|iPhone|iPod/.test(userAgent)) {
-          const deepLink = handleYouTubeLink(target, userAgent);
-          console.log('YouTube Deep Link:', deepLink);
           const fallbackUrl = target;
           sendDeepLinkWithFallback(res, deepLink, fallbackUrl);
         } else {
-          serverRedirect(res, target);
+          serverRedirect(res, deepLink);
         }
       } else {
-        console.log('Redirecting to target...');
         serverRedirect(res, target);
       }
     }
