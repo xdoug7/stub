@@ -55,14 +55,7 @@ export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, 
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
   if (ua) {
-    /* Note:
-     * - bot is for most bots & crawlers
-     * - ChatGPT is for ChatGPT
-     * - facebookexternalhit is for Facebook crawler
-     * - WhatsApp is for WhatsApp crawler
-     * - MetaInspector is for https://metatags.io/
-     */
-    return /bot|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector/i.test(ua);
+    return /bot|crawler|spider|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector|Twitterbot|Yahoo|AhrefsBot/i.test(ua);
   }
   return false;
 };
