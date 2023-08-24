@@ -31,6 +31,58 @@ export async function recordClick(hostname: string, req: IncomingMessage, ip: st
   );
 }
 
+function handleYouTubeLink(url: string, userAgent: string) {
+  // Define a set of regular expressions to match various YouTube URL patterns
+  const patterns = {
+    channel: [
+      /^https:\/\/youtube\.com\/@(\w+)/,
+      /^https:\/\/youtube\.com\/c\/(\w+)/,
+    ],
+    video: [
+      /^https:\/\/youtube\.com\/watch\?v=([\w-]+)/,
+      /^https:\/\/youtu\.be\/([\w-]+)/,
+    ],
+    shortVideo: [/^https:\/\/youtube\.com\/shorts\/([\w-]+)/],
+    liveVideo: [/^https:\/\/youtube\.com\/live\/([\w-]+)/],
+    playlist: [/^https:\/\/youtube\.com\/playlist\?list=([\w-]+)/],
+  };
+
+  // Define corresponding app deep link formats for iOS and Android
+  const appLinks = {
+    ios: {
+      channel: 'youtube://channel/$1',
+      video: 'youtube://video/watch?v=$1',
+      shortVideo: 'youtube://video/shorts/$1',
+      liveVideo: 'youtube://video/live/$1',
+      playlist: 'youtube://playlist?list=$1',
+    },
+    android: {
+      channel: 'youtube://channel/$1',
+      video: 'youtube://watch?v=$1',
+      shortVideo: 'youtube://shorts/$1',
+      liveVideo: 'youtube://live/$1',
+      playlist: 'youtube://playlist?list=$1',
+    },
+  };
+
+  // Detect the device type (iOS/Android) based on the user agent
+  const deviceType = /iPhone|iPad|iPod/.test(userAgent) ? 'ios' : /Android/.test(userAgent) ? 'android' : 'other';
+
+  // Try to match the URL with each pattern and return the corresponding deep link
+  for (const [category, regexes] of Object.entries(patterns)) {
+    for (const pattern of regexes) {
+      const match = url.match(pattern);
+      if (match) {
+        const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
+        return deepLink.replace('$1', match[1]);
+      }
+    }
+  }
+
+  // Return the original URL if no pattern matches
+  return url;
+}
+
 export default async function handleLink(req: IncomingMessage, res: ServerResponse) {
   const { hostname, key: linkKey, query } = parseUrl(req);
   console.log('Parsed URL:', { hostname, key: linkKey, query });
@@ -59,12 +111,15 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
   });
   console.log('Response from Redis:', response);
 
+  // Check if the target URL is a YouTube link, and handle it accordingly
   const target = response?.url;
   console.log('Target URL:', target);
 
   if (target) {
     const isBot = detectBot(req);
     console.log('Is Bot:', isBot);
+
+    // Check if the target URL is a YouTube link and if so, convert it to a deep link
     if (response.password) {
       if (await validPasswordCookie(req, hostname, key)) {
         console.log('Valid password cookie. Redirecting...');
@@ -98,8 +153,15 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       res.statusCode = 200;
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
-      console.log('Redirecting to target...');
-      serverRedirect(res, target);
+      if (target.startsWith('https://youtube.com') || target.startsWith('https://youtu.be')) {
+        const userAgent = req.headers['user-agent'] || '';
+        const deepLink = handleYouTubeLink(target, userAgent);
+        console.log('YouTube Deep Link:', deepLink);
+        serverRedirect(res, deepLink);
+      } else {
+        console.log('Redirecting to target...');
+        serverRedirect(res, target);
+      }
     }
     await recordClick(hostname, req, ip, key);
   } else {
