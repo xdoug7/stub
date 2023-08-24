@@ -153,7 +153,9 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
       res.statusCode = 200;
       res.end(await getEmbedHTML(res, hostname, key));
     } else {
-      const isYouTubeLink = target.startsWith('https://youtube.com') || target.startsWith('https://youtu.be')
+      // Check if the target URL is a YouTube link
+      const youtubePattern = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//;
+      const isYouTubeLink = youtubePattern.test(target)
       console.log('Is YouTube? ', isYouTubeLink);
       if (isYouTubeLink) {
         const userAgent = req.headers['user-agent'] || '';
