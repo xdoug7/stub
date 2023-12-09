@@ -16,7 +16,7 @@ export default withProjectAuth(async (req: NextApiRequest, res: NextApiResponse,
     const start = Date.now() - intervalData[interval || '24h'].milliseconds;
     const end = Date.now();
     const response = await redis
-      .zrange(`${project.domain}:clicks:${key}`, start, end, 'BYSCORE')
+      .zrangebyscore(`${project.domain}:clicks:${key}`, start, end)
       .then((r) => r.map((s) => JSON.parse(s) as RawStatsProps));
     const data = processData(key, response, interval);
     return res.status(200).json(data);
