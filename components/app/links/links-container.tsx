@@ -16,7 +16,15 @@ export default function LinksContainer({ AddEditLinkButton }: { AddEditLinkButto
     slug: string;
   };
 
-  const { data: links, isValidating } = useSWR<LinkProps[]>(`/control/api/projects/${slug}/links${getQueryString(router)}`, fetcher);
+  const { data: links, isValidating } = useSWR<LinkProps[]>(
+    `/control/api/projects/${slug}/links${getQueryString(router)}`,
+    fetcher,
+    {
+      dedupingInterval: 20000,
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+    }
+  );
 
   return (
     <MaxWidthWrapper className="pb-10">
