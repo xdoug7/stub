@@ -17,7 +17,7 @@ module.exports = {
       'www.google.com',
       'avatar.tobi.sh',
       'faisalman.github.io',
-      'avatars.dicebear.com',
+      'api.dicebear.com',
       'cdn.discordapp.com',
       'avatars.githubusercontent.com',
       'pbs.twimg.com'
