@@ -117,15 +117,18 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
   // Check if the target URL is a YouTube link, and handle it accordingly
   const target = response?.url;
 
-  console.log("===================================");
-  console.log(" Target URL: ", target);
-  console.log("===================================");
-  console.log(" Request Headers: ");
-  console.table(req.headers);
-  console.log("===================================");
-  console.log(" Redis Key: ", `${hostname}:${key}`);
-  console.log("===================================");
+// Filter out the 'cookie' header
+const filteredHeaders = { ...req.headers };
+delete filteredHeaders.cookie;
 
+console.log("===================================");
+console.log(" Request Headers: ");
+console.table(filteredHeaders);
+console.log("===================================");
+console.log(" Redis Key: ", `${hostname}:${key}`);
+console.log("===================================");
+console.log(" Target URL: ", target);
+console.log("===================================");
 
   if (target) {
     const isBot = detectBot(req);
