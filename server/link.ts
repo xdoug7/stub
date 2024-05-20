@@ -133,6 +133,9 @@ console.log("===================================");
   if (target) {
     const isBot = detectBot(req);
 
+    console.log(" is Bot: ", isBot);
+    console.log("===================================");
+
     // Check if the target URL is a YouTube link and if so, convert it to a deep link
     if (response.password) {
       if (await validPasswordCookie(req, hostname, key)) {

@@ -55,7 +55,7 @@ export function sendDeepLinkWithFallback(res: ServerResponse, deepLink: string, 
 export const detectBot = (req: IncomingMessage) => {
   const ua = req.headers['user-agent'];
   if (ua) {
-    return /bot|crawler|spider|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector|Twitterbot|Yahoo|AhrefsBot/i.test(ua);
+    return /bot|crawler|spider|chatgpt|facebookexternalhit|WhatsApp|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|MetaInspector|Twitterbot|Yahoo|AhrefsBot|bytespider/i.test(ua);
   }
   return false;
 };
