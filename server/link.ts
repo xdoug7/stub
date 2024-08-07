@@ -78,7 +78,7 @@ function handleYouTubeLink(url: string, userAgent: string) {
           console.log(`No deep link for '${category}' category on device type 'other'. Returning original URL.`);
           return url;
         }
-        
+
         const deepLink = appLinks[deviceType][category] || appLinks.ios[category];
         return deepLink.replace('$1', match[2]);
       }
@@ -90,6 +90,10 @@ function handleYouTubeLink(url: string, userAgent: string) {
   return url;
 }
 
+function getHeaderValue(headerValue: string | string[]): string {
+  return Array.isArray(headerValue) ? headerValue[0].toString() : headerValue.toString();
+}
+
 export default async function handleLink(req: IncomingMessage, res: ServerResponse) {
   const { hostname, key: linkKey, query } = parseUrl(req);
 
@@ -97,14 +101,21 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
   if (!hostname) return false;
 
   // Get the IP
+  const cloudflareHeader = 'cf-connecting-ip';
+
   let ip = req.socket.remoteAddress ?? '127.0.0.1';
-  const cloudflareHeader = 'cf-connecting-ip'
+
   if (process.env.TRUST_PROXY === 'true') {
     const proxyHeader = process.env.TRUST_PROXY_HEADER || cloudflareHeader;
-    if (proxyHeader && req.headers[proxyHeader]) {
-      ip = Array.isArray(req.headers[proxyHeader]) ? req.headers[proxyHeader][0] : req.headers[proxyHeader];
-    } else if (req.headers[cloudflareHeader]) {
-      ip = Array.isArray(req.headers[cloudflareHeader]) ? req.headers[cloudflareHeader][0] : req.headers[cloudflareHeader];
+    const headerValue = req.headers[proxyHeader];
+
+    if (headerValue) {
+      ip = getHeaderValue(headerValue);
+    } else {
+      const cloudflareHeaderValue = req.headers[cloudflareHeader];
+      if (cloudflareHeaderValue) {
+        ip = getHeaderValue(cloudflareHeaderValue);
+      }
     }
   }
 
@@ -121,18 +132,18 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
   // Check if the target URL is a YouTube link, and handle it accordingly
   const target = response?.url;
 
-// Filter out the 'cookie' header
-const filteredHeaders = { ...req.headers };
-delete filteredHeaders.cookie;
+  // Filter out the 'cookie' header
+  const filteredHeaders = { ...req.headers };
+  delete filteredHeaders.cookie;
 
-console.log("===================================");
-console.log(" Request Headers: ");
-console.table(filteredHeaders);
-console.log("===================================");
-console.log(" Redis Key: ", `${hostname}:${key}`);
-console.log("===================================");
-console.log(" Target URL: ", target);
-console.log("===================================");
+  console.log("===================================");
+  console.log(" Request Headers: ");
+  console.table(filteredHeaders);
+  console.log("===================================");
+  console.log(" Redis Key: ", `${hostname}:${key}`);
+  console.log("===================================");
+  console.log(" Target URL: ", target);
+  console.log("===================================");
 
   if (target) {
     const isBot = detectBot(req);
