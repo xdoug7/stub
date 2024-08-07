@@ -98,10 +98,14 @@ export default async function handleLink(req: IncomingMessage, res: ServerRespon
 
   // Get the IP
   let ip = req.socket.remoteAddress ?? '127.0.0.1';
+  const cloudflareHeader = 'cf-connecting-ip'
   if (process.env.TRUST_PROXY === 'true') {
-    const proxyHeader = process.env.TRUST_PROXY_HEADER || 'cf-connecting-ip';
-    if (proxyHeader && req.headers[proxyHeader])
-      ip = Array.isArray(req.headers[proxyHeader]) ? req.headers[proxyHeader][0] : (req.headers[proxyHeader] as string);
+    const proxyHeader = process.env.TRUST_PROXY_HEADER || cloudflareHeader;
+    if (proxyHeader && req.headers[proxyHeader]) {
+      ip = Array.isArray(req.headers[proxyHeader]) ? req.headers[proxyHeader][0] : req.headers[proxyHeader];
+    } else if (req.headers[cloudflareHeader]) {
+      ip = Array.isArray(req.headers[cloudflareHeader]) ? req.headers[cloudflareHeader][0] : req.headers[cloudflareHeader];
+    }
   }
 
   const response = await redis.get(`${hostname}:${key}`).then((r) => {
