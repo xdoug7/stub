@@ -73,13 +73,14 @@ const withProjectAuth = (handler: CustomNextApiHandler) => async (req: NextApiRe
 
   // Fast path for API key auth - minimal DB query
   if (validateApiKey(req)) {
-    const project = await prisma.project.findUnique({
+    const projectData = await prisma.project.findUnique({
       where: { slug },
-      select: { id: true, name: true, slug: true, domain: true, users: { take: 0 } }
+      select: { id: true, name: true, slug: true, domain: true }
     });
-    if (!project) {
+    if (!projectData) {
       return res.status(404).json({ error: 'Project not found' });
     }
+    const project = { ...projectData, users: [] as { role: string; userId: string }[] };
     const apiKeyUserId = process.env.STUB_API_KEY_USER_ID || 'api-key';
     const apiKeySession: Session = { user: { id: apiKeyUserId, superadmin: true } };
     return handler(req, res, project, apiKeySession);
