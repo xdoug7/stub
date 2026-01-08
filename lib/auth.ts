@@ -66,42 +66,47 @@ interface CustomNextApiHandler {
 }
 
 const withProjectAuth = (handler: CustomNextApiHandler) => async (req: NextApiRequest, res: NextApiResponse) => {
-  const isApiKeyValid = validateApiKey(req);
-  const session = isApiKeyValid ? null : await getSession(req, res);
-
-  if (!isApiKeyValid && !session?.user.id) {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
-
   const { slug } = req.query;
   if (!slug || typeof slug !== 'string') {
     return res.status(400).json({ error: 'Missing or misconfigured project slug' });
   }
 
+  // Fast path for API key auth - minimal DB query
+  if (validateApiKey(req)) {
+    const project = await prisma.project.findUnique({
+      where: { slug },
+      select: { id: true, name: true, slug: true, domain: true, users: { take: 0 } }
+    });
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    const apiKeyUserId = process.env.STUB_API_KEY_USER_ID || 'api-key';
+    const apiKeySession: Session = { user: { id: apiKeyUserId, superadmin: true } };
+    return handler(req, res, project, apiKeySession);
+  }
+
+  // Session-based auth path
+  const session = await getSession(req, res);
+  if (!session?.user.id) {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+
   const project = await prisma.project.findUnique({
     where: {
       slug,
-      ...(isApiKeyValid || session?.user?.superadmin
+      ...(session.user.superadmin
         ? {}
-        : {
-            users: {
-              some: {
-                userId: session!.user.id
-              }
-            }
-          })
+        : { users: { some: { userId: session.user.id } } })
     },
     select: {
       id: true,
       name: true,
       slug: true,
       domain: true,
-      users: isApiKeyValid
-        ? { select: { userId: true, role: true }, take: 0 }
-        : {
-            where: { userId: session!.user.id },
-            select: { userId: true, role: true }
-          }
+      users: {
+        where: { userId: session.user.id },
+        select: { userId: true, role: true }
+      }
     }
   });
 
@@ -109,11 +114,11 @@ const withProjectAuth = (handler: CustomNextApiHandler) => async (req: NextApiRe
     return res.status(404).json({ error: 'Project not found' });
   }
 
-  if (!isApiKeyValid && project.users.length === 0) {
+  if (project.users.length === 0) {
     const pendingInvites = await prisma.projectInvite.findUnique({
       where: {
         email_projectId: {
-          email: session!.user.email!,
+          email: session.user.email!,
           projectId: project.id
         }
       },
@@ -128,9 +133,7 @@ const withProjectAuth = (handler: CustomNextApiHandler) => async (req: NextApiRe
     }
   }
 
-  const apiKeyUserId = process.env.STUB_API_KEY_USER_ID || 'api-key';
-  const apiKeySession: Session = { user: { id: apiKeyUserId, superadmin: true } };
-  return handler(req, res, project, isApiKeyValid ? apiKeySession : session!);
+  return handler(req, res, project, session);
 };
 
 interface WithUserNextApiHandler {
