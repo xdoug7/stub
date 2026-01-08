@@ -128,7 +128,8 @@ const withProjectAuth = (handler: CustomNextApiHandler) => async (req: NextApiRe
     }
   }
 
-  const apiKeySession: Session = { user: { id: 'api-key', superadmin: true } };
+  const apiKeyUserId = process.env.STUB_API_KEY_USER_ID || 'api-key';
+  const apiKeySession: Session = { user: { id: apiKeyUserId, superadmin: true } };
   return handler(req, res, project, isApiKeyValid ? apiKeySession : session!);
 };
 
