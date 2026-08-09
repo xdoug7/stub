@@ -52,7 +52,7 @@ Stub is split into two applications, the app itself and the router. The router i
 
 ## Deploy Your Own
 ### Manual
-Make sure you have Node.js v16 installed. You could install newer versions of Node, but [next-auth is restricted to some versions](https://github.com/nextauthjs/next-auth/blob/ac5d8a9795be64f2c096751e388a7303f284e703/package.json#L43) and you will need to add `--ignore-engines` while installing dependencies.
+Make sure you have Node.js v18 installed. You could install newer versions of Node, but [next-auth is restricted to some versions](https://github.com/nextauthjs/next-auth/blob/ac5d8a9795be64f2c096751e388a7303f284e703/package.json#L43) and you will need to add `--ignore-engines` while installing dependencies.
 
 You can build Stub with these commands:
 ```sh
