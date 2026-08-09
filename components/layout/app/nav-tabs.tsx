@@ -12,6 +12,7 @@ const TabsHelper = (router: NextRouter): { name: string; href: string }[] => {
   else if (slug)
     return [
       { name: 'Links', href: `/p/${slug}` },
+      { name: 'Analytics', href: `/p/${slug}/analytics` },
       { name: 'Settings', href: `/p/${slug}/settings` }
     ];
   else if (router.pathname.startsWith('/admin/users/') && id)
@@ -38,16 +39,21 @@ export default function NavTabs() {
     }
   }, [router.query]);
 
+  // the most specific matching tab wins, so /p/x/settings/people highlights Settings rather than Links
+  const activeHref = useMemo(() => {
+    const path = router.asPath.split('?')[0];
+    return tabs
+      .filter(({ href }) => path === href || path.startsWith(`${href}/`))
+      .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  }, [tabs, router.asPath]);
+
   return (
     <div className="flex justify-start space-x-2 items-center h-12 -mb-0.5">
       {tabs.map(({ name, href }) => (
         <Link key={href} href={href}>
           <a
             className={`border-b-2 p-1 ${
-              // hacky approach to getting the current tab – will replace with useSelectedLayoutSegments when upgrading to Next.js 13
-              router.asPath.split('?')[0].split('/').slice(0, 3).join('/') === href
-                ? 'border-black text-black'
-                : 'border-transparent text-gray-600 hover:text-black'
+              activeHref === href ? 'border-black text-black' : 'border-transparent text-gray-600 hover:text-black'
             }`}
           >
             <div className="rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-200 transition-all duration-75">

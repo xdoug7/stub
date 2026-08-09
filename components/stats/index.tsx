@@ -16,12 +16,16 @@ export default function Stats({ atModalTop, domain }: { atModalTop?: boolean; do
 
   const { slug, key, interval } = router.query as {
     slug?: string;
-    key: string;
+    key?: string;
     interval?: string;
   };
 
+  const endpoint = key
+    ? `/control/api/projects/${slug}/links/${encodeURIComponent(key)}/stats`
+    : `/control/api/projects/${slug}/stats`;
+
   const { data, error, isValidating } = useSWR<StatsProps>(
-    router.isReady && `/control/api/projects/${slug}/links/${encodeURIComponent(key)}/stats${interval ? `?interval=${interval}` : ''}`,
+    router.isReady && `${endpoint}${interval ? `?interval=${interval}` : ''}`,
     fetcher,
     {
       keepPreviousData: true,
@@ -34,10 +38,10 @@ export default function Stats({ atModalTop, domain }: { atModalTop?: boolean; do
       {error && error.status === 404 ? (
         <div className="max-w-xl mx-auto flex flex-col items-center gap-10">
           <CursorIllustration className="w-36 h-36 text-amber-500/50" />
-          <h1 className="text-xl sm:text-2xl text-gray-600">This link does not exist...</h1>
-          <Link href={`/p/${slug}`}>
+          <h1 className="text-xl sm:text-2xl text-gray-600">{key ? 'This link does not exist...' : 'This project does not exist...'}</h1>
+          <Link href={key ? `/p/${slug}` : '/'}>
             <a className="bg-black hover:bg-white text-white hover:text-black border-black flex justify-center items-center w-full text-sm h-10 rounded-md border transition-all focus:outline-none gap-2">
-              Back to links
+              {key ? 'Back to links' : 'Back to projects'}
             </a>
           </Link>
         </div>

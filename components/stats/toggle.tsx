@@ -17,7 +17,7 @@ export default function Toggle({
   atModalTop
 }: {
   domain: string;
-  linkKey: string;
+  linkKey?: string;
   slug: string;
   interval?: string;
   atModalTop?: boolean;
@@ -27,15 +27,22 @@ export default function Toggle({
   const currentInterval = (interval as IntervalProps) || '24h';
 
   const atTop = useScroll(80) || atModalTop;
+  const basePath = linkKey ? `/p/${slug}/link/${encodeURIComponent(linkKey)}` : `/p/${slug}/analytics`;
   return (
     <div className={`z-10 mb-5 top-[6.5rem] sticky p-5 -mx-2.5 lg:mx-0 bg-gray-50 ${atTop ? 'shadow-md' : ''}`}>
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 justify-between items-center">
         <div className="flex text-xl text-gray-800 font-semibold gap-2">
-          <CopyButton url={linkConstructor({ key: linkKey, domain })} />
-          <a className="group flex" href={linkConstructor({ key: linkKey, domain })} target="_blank" rel="noreferrer">
-            {linkConstructor({ key: linkKey, domain, pretty: true })}
-            <ExpandingArrow className="w-5 h-5" />
-          </a>
+          {linkKey ? (
+            <>
+              <CopyButton url={linkConstructor({ key: linkKey, domain })} />
+              <a className="group flex" href={linkConstructor({ key: linkKey, domain })} target="_blank" rel="noreferrer">
+                {linkConstructor({ key: linkKey, domain, pretty: true })}
+                <ExpandingArrow className="w-5 h-5" />
+              </a>
+            </>
+          ) : (
+            domain
+          )}
         </div>
         <div className="px-3 py-1 rounded-md shadow-md border bg-white border-gray-100">
           <BadgeSelect
@@ -50,7 +57,7 @@ export default function Toggle({
                     interval
                   }
                 },
-                `/p/${slug}/link/${encodeURIComponent(linkKey)}?interval=${interval}`,
+                `${basePath}?interval=${interval}`,
                 { shallow: true }
               );
             }}
